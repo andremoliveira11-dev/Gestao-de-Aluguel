@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALUGUEL FÁCIL - Gestão de Imóveis e Aluguéis</title>
+  <style>
+    /* ==========================================================================
+       1. VARIÁVEIS E RESET DE ESTILOS
+       ========================================================================== */
+    :root {
+      --primary: #1e3a8a;
+      --primary-hover: #1d4ed8;
+      --secondary: #0f172a;
+      --background: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #334155;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      
+      --radius: 8px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --transition: all 0.2s ease-in-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ==========================================================================
+       2. LAYOUT & ESTRUTURA PRINCIPAL
+       ========================================================================== */
+    .app-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Sidebar / Menu Lateral */
+    .sidebar {
+      width: 260px;
+      background-color: var(--secondary);
+      color: #ffffff;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2rem;
+      padding: 0 0.5rem;
+    }
+
+    .brand-icon {
+      background-color: var(--primary-hover);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+    }
+
+    .nav-item button:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .nav-item.active button {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Áreas de Conteúdo */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile Header Toggle */
+    .mobile-header {
+      display: none;
+      background-color: var(--secondary);
+      color: white;
+      padding: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       3. COMPONENTES REUTILIZÁVEIS (CARDS, FORMULÁRIOS, TABELAS)
+       ========================================================================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1.5rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      color: var(--secondary);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+
+    /* Dashboard Metric Cards */
+    .metric-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .metric-data .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .metric-data .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Formulários */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.375rem;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      transition: var(--transition);
+      background-color: #fff;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    /* Botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: #f1f5f9;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #15803d;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+      border-color: #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    /* Tabelas */
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 50px;
+    }
+
+    .badge-pago {
+      background-color: var(--success-bg);
+      color: var(--success);
+    }
+
+    .badge-vencer {
+      background-color: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .badge-atrasado {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    /* Notificações (Toasts) */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius);
+      background-color: var(--secondary);
+      color: white;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       4. ESTILOS DE IMPRESSÃO (RECIBO)
+       ========================================================================== */
+    .printable-recibo {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #recibo-print, #recibo-print * {
+        visibility: visible;
+      }
+      #recibo-print {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+        background: white;
+      }
+      .recibo-box {
+        border: 2px solid #000;
+        padding: 30px;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .recibo-header {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+      }
+      .recibo-body p {
+        margin-bottom: 12px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      .recibo-footer {
+        margin-top: 40px;
+        text-align: right;
+      }
+      .assinatura {
+        margin-top: 50px;
+        border-top: 1px solid #000;
+        display: inline-block;
+        width: 250px;
+        text-align: center;
+        padding-top: 5px;
+      }
+    }
+
+    /* ==========================================================================
+       5. RESPONSIVIDADE
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .sidebar {
+        width: 100%;
+        display: none;
+      }
+      .sidebar.open {
+        display: flex;
+      }
+      .main-content {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Mobile -->
+  <div class="mobile-header">
+    <div class="brand">
+      <div class="brand-icon">A</div>
+      <span>ALUGUEL FÁCIL</span>
+    </div>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+  </div>
+
+  <div class="app-container">
+    <!-- Menu Lateral (Sidebar) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">A</div>
+        <span>ALUGUEL FÁCIL</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item active" id="nav-dashboard">
+          <button onclick="switchTab('dashboard')">📊 Dashboard</button>
+        </li>
+        <li class="nav-item" id="nav-imoveis">
+          <button onclick="switchTab('imoveis')">🏠 Imóveis</button>
+        </li>
+        <li class="nav-item" id="nav-locatarios">
+          <button onclick="switchTab('locatarios')">👤 Locatários</button>
+        </li>
+        <li class="nav-item" id="nav-contratos">
+          <button onclick="switchTab('contratos')">📄 Contratos</button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      
+      <!-- 1. TELA DASHBOARD -->
+      <section id="tab-dashboard" class="tab-content active">
+        <div class="top-header">
+          <h1 class="page-title">Dashboard</h1>
+        </div>
+
+        <div class="grid-4">
+          <div class="card metric-card">
+            <div class="metric-icon" style="background: #e0f2fe; color: #0284c7;">🏠</div>
+            <div class="metric-data">
+              <div class="value" id="dash-total-imoveis">0</div>
+              <div class="label">Total de Imóveis</div>
+            </div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-icon" style="background: var(--success-bg); color: var(--success);">🔑</div>
+            <div class="metric-data">
+              <div class="value" id="dash-alugados">0</div>
+              <div class="label">Imóveis Alugados</div>
+            </div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-icon" style="background: var(--warning-bg); color: var(--warning);">🔓</div>
+            <div class="metric-data">
+              <div class="value" id="dash-vagos">0</div>
+              <div class="label">Imóveis Vagos</div>
+            </div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-icon" style="background: var(--danger-bg); color: var(--danger);">⚠️</div>
+            <div class="metric-data">
+              <div class="value" id="dash-atrasos">0</div>
+              <div class="label">Pagamentos Atrasados</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="card-title">Ações Rápidas</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <button class="btn btn-secondary" onclick="switchTab('imoveis')" style="justify-content: start;">
+                🏠 Cadastrar Novo Imóvel
+              </button>
+              <button class="btn btn-secondary" onclick="switchTab('locatarios')" style="justify-content: start;">
+                👤 Cadastrar Novo Locatário
+              </button>
+              <button class="btn btn-primary" onclick="switchTab('contratos')" style="justify-content: start;">
+                📄 Criar Novo Contrato
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Resumo Financeiro (Mês)</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span style="color: var(--text-muted);">Total de Receita Esperada:</span>
+              <strong id="dash-receita-total" style="font-size: 1.1rem;">R$ 0,00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--text-muted);">Total Recebido:</span>
+              <strong id="dash-receita-paga" style="font-size: 1.1rem; color: var(--success);">R$ 0,00</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. TELA IMÓVEIS -->
+      <section id="tab-imoveis" class="tab-content">
+        <div class="top-header">
+          <h1 class="page-title">Gestão de Imóveis</h1>
+        </div>
+
+        <div class="grid-2">
+          <!-- Formulário Cadastro Imóvel -->
+          <div class="card">
+            <h2 class="card-title">Cadastrar Imóvel</h2>
+            <form id="form-imovel" onsubmit="handleCadastrarImovel(event)">
+              <div class="form-group">
+                <label>Nome / Identificação do Imóvel</label>
+                <input type="text" id="imovel-nome" class="form-control" placeholder="Ex: Apto 102 - Bloco B" required>
+              </div>
+              <div class="form-group">
+                <label>Endereço Completo</label>
+                <input type="text" id="imovel-endereco" class="form-control" placeholder="Rua, Número, Bairro, Cidade" required>
+              </div>
+              <div class="form-group">
+                <label>Tipo do Imóvel</label>
+                <select id="imovel-tipo" class="form-control" required>
+                  <option value="">Selecione...</option>
+                  <option value="Casa">Casa</option>
+                  <option value="Apartamento">Apartamento</option>
+                  <option value="Sala Comercial">Sala Comercial</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Valor do Aluguel (R$)</label>
+                <input type="number" id="imovel-valor" class="form-control" step="0.01" placeholder="1500.00" required>
+              </div>
+              <div class="form-group">
+                <label>Dia do Vencimento Padrão</label>
+                <input type="number" id="imovel-vencimento" class="form-control" min="1" max="31" placeholder="Ex: 10" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Cadastrar Imóvel</button>
+            </form>
+          </div>
+
+          <!-- Lista de Imóveis -->
+          <div class="card">
+            <h2 class="card-title">Imóveis Cadastrados</h2>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="lista-imoveis">
+                  <!-- Injetado via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. TELA LOCATÁRIOS -->
+      <section id="tab-locatarios" class="tab-content">
+        <div class="top-header">
+          <h1 class="page-title">Gestão de Locatários</h1>
+        </div>
+
+        <div class="grid-2">
+          <!-- Formulário Cadastro Locatário -->
+          <div class="card">
+            <h2 class="card-title">Cadastrar Locatário</h2>
+            <form id="form-locatario" onsubmit="handleCadastrarLocatario(event)">
+              <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" id="locatario-nome" class="form-control" placeholder="Ex: João da Silva" required>
+              </div>
+              <div class="form-group">
+                <label>CPF</label>
+                <input type="text" id="locatario-cpf" class="form-control" placeholder="000.000.000-00" required>
+              </div>
+              <div class="form-group">
+                <label>Telefone / WhatsApp</label>
+                <input type="text" id="locatario-telefone" class="form-control" placeholder="(00) 00000-0000" required>
+              </div>
+              <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="locatario-email" class="form-control" placeholder="joao@email.com" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Cadastrar Locatário</button>
+            </form>
+          </div>
+
+          <!-- Lista de Locatários -->
+          <div class="card">
+            <h2 class="card-title">Locatários Cadastrados</h2>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Contato</th>
+                    <th>CPF</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="lista-locatarios">
+                  <!-- Injetado via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. TELA CONTRATOS -->
+      <section id="tab-contratos" class="tab-content">
+        <div class="top-header">
+          <h1 class="page-title">Contratos de Aluguel</h1>
+        </div>
+
+        <!-- Form Novo Contrato -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h2 class="card-title">Novo Contrato</h2>
+          <form id="form-contrato" onsubmit="handleGerarContrato(event)">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+              <div class="form-group">
+                <label>Selecione o Locatário</label>
+                <select id="contrato-locatario" class="form-control" required>
+                  <!-- Injetado via JS -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Selecione o Imóvel Vago</label>
+                <select id="contrato-imovel" class="form-control" required>
+                  <!-- Injetado via JS -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Data de Início</label>
+                <input type="date" id="contrato-inicio" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Data de Término</label>
+                <input type="date" id="contrato-fim" class="form-control" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Gerar Contrato</button>
+          </form>
+        </div>
+
+        <!-- Tabela de Contratos -->
+        <div class="card">
+          <h2 class="card-title">Contratos Ativos e Cobranças</h2>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Inquilino</th>
+                  <th>Imóvel</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Status</th>
+                  <th>Ações / Cobrança</th>
+                </tr>
+              </thead>
+              <tbody id="lista-contratos">
+                <!-- Injetado via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Componente Toast (Notificações) -->
+  <div id="toast" class="toast">Ação realizada com sucesso!</div>
+
+  <!-- Área oculta para Impressão de Recibo PDF -->
+  <div id="recibo-print" class="printable-recibo">
+    <div class="recibo-box">
+      <div class="recibo-header">
+        <h2>RECIBO DE ALUGUEL</h2>
+        <p><strong>ALUGUEL FÁCIL - Gestão Imobiliária</strong></p>
+      </div>
+      <div class="recibo-body">
+        <p>Recebemos de <strong id="recibo-locatario">---</strong> a quantia de <strong id="recibo-valor">R$ 0,00</strong> referente ao pagamento de aluguel do imóvel situado em:</p>
+        <p><em id="recibo-imovel">---</em></p>
+        <p>Data do Pagamento/Emissão: <span id="recibo-data">---</span></p>
+        <p>Por ser verdade, firmamos o presente recibo dando plena e geral quitação.</p>
+      </div>
+      <div class="recibo-footer">
+        <div class="assinatura">
+          <span>Proprietário / Administração</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+     6. LÓGICA JAVASCRIPT (MEMÓRIA / SEED DATA / REGRA DE NEGÓCIO)
+     ========================================================================== -->
+  <script>
+    /* --------------------------------------------------------------------------
+       ESTADO DA APLICAÇÃO (MEMÓRIA) & SEED DATA
+       -------------------------------------------------------------------------- */
+    let imoveis = [
+      { id: 1, nome: "Apto 101 - Ed. Solar", endereco: "Rua das Flores, 123", tipo: "Apartamento", valor: 1200.00, diaVencimento: 10, status: "Alugado" },
+      { id: 2, nome: "Casa Centro", endereco: "Av. Brasil, 450", tipo: "Casa", valor: 2500.00, diaVencimento: 5, status: "Vago" }
+    ];
+
+    let locatarios = [
+      { id: 1, nome: "Carlos Eduardo", cpf: "111.222.333-44", telefone: "11988887777", email: "carlos@email.com" },
+      { id: 2, nome: "Ana Maria Souza", cpf: "555.666.777-88", telefone: "11977776666", email: "ana@email.com" }
+    ];
+
+    let contratos = [
+      {
+        id: 1,
+        locatarioId: 1,
+        imovelId: 1,
+        dataInicio: "2026-01-01",
+        dataFim: "2027-01-01",
+        pago: false // Estado do pagamento do mês vigente
+      }
+    ];
+
+    /* --------------------------------------------------------------------------
+       INICIALIZAÇÃO DA PÁGINA
+       -------------------------------------------------------------------------- */
+    document.addEventListener("DOMContentLoaded", () => {
+      renderAll();
+    });
+
+    function renderAll() {
+      renderImoveis();
+      renderLocatarios();
+      renderContratos();
+      renderDashboard();
+    }
+
+    /* --------------------------------------------------------------------------
+       NAVEGAÇÃO POR ABAS
+       -------------------------------------------------------------------------- */
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+
+      document.getElementById(`tab-${tabName}`).classList.add("active");
+      document.getElementById(`nav-${tabName}`).classList.add("active");
+
+      // Fechar menu mobile se estiver aberto
+      document.getElementById("sidebar").classList.remove("open");
+
+      // Atualiza listagens que dependem de select dinâmico
+      if(tabName === 'contratos') {
+        atualizarSelectsContrato();
+      }
+      
+      renderDashboard();
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open");
+    }
+
+    /* --------------------------------------------------------------------------
+       LÓGICA DE IMÓVEIS
+       -------------------------------------------------------------------------- */
+    function handleCadastrarImovel(e) {
+      e.preventDefault();
+      const nome = document.getElementById("imovel-nome").value;
+      const endereco = document.getElementById("imovel-endereco").value;
+      const tipo = document.getElementById("imovel-tipo").value;
+      const valor = parseFloat(document.getElementById("imovel-valor").value);
+      const diaVencimento = parseInt(document.getElementById("imovel-vencimento").value);
+
+      const novoImovel = {
+        id: Date.now(),
+        nome,
+        endereco,
+        tipo,
+        valor,
+        diaVencimento,
+        status: "Vago"
+      };
+
+      imoveis.push(novoImovel);
+      showToast("Imóvel cadastrado com sucesso!");
+      document.getElementById("form-imovel").reset();
+      renderImoveis();
+      renderDashboard();
+    }
+
+    function excluirImovel(id) {
+      // Verifica se o imóvel tem contrato ativo
+      const temContrato = contratos.some(c => c.imovelId === id);
+      if(temContrato) {
+        showToast("Não é possível excluir um imóvel vinculado a um contrato ativo!", true);
+        return;
+      }
+
+      imoveis = imoveis.filter(i => i.id !== id);
+      showToast("Imóvel excluído com sucesso!");
+      renderImoveis();
+      renderDashboard();
+    }
+
+    function renderImoveis() {
+      const tbody = document.getElementById("lista-imoveis");
+      tbody.innerHTML = "";
+
+      if(imoveis.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Nenhum imóvel cadastrado.</td></tr>`;
+        return;
+      }
+
+      imoveis.forEach(imovel => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${imovel.nome}</strong><br><small style="color:var(--text-muted);">${imovel.endereco}</small></td>
+          <td>${imovel.tipo}</td>
+          <td>R$ ${imovel.valor.toFixed(2)}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="excluirImovel(${imovel.id})">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       LÓGICA DE LOCATÁRIOS
+       -------------------------------------------------------------------------- */
+    function handleCadastrarLocatario(e) {
+      e.preventDefault();
+      const nome = document.getElementById("locatario-nome").value;
+      const cpf = document.getElementById("locatario-cpf").value;
+      const telefone = document.getElementById("locatario-telefone").value;
+      const email = document.getElementById("locatario-email").value;
+
+      const novoLocatario = {
+        id: Date.now(),
+        nome,
+        cpf,
+        telefone,
+        email
+      };
+
+      locatarios.push(novoLocatario);
+      showToast("Locatário cadastrado com sucesso!");
+      document.getElementById("form-locatario").reset();
+      renderLocatarios();
+      renderDashboard();
+    }
+
+    function excluirLocatario(id) {
+      const temContrato = contratos.some(c => c.locatarioId === id);
+      if(temContrato) {
+        showToast("Não é possível excluir um locatário com contrato ativo!", true);
+        return;
+      }
+
+      locatarios = locatarios.filter(l => l.id !== id);
+      showToast("Locatário excluído com sucesso!");
+      renderLocatarios();
+      renderDashboard();
+    }
+
+    function renderLocatarios() {
+      const tbody = document.getElementById("lista-locatarios");
+      tbody.innerHTML = "";
+
+      if(locatarios.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Nenhum locatário cadastrado.</td></tr>`;
+        return;
+      }
+
+      locatarios.forEach(locatario => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${locatario.nome}</strong></td>
+          <td>${locatario.telefone}<br><small style="color:var(--text-muted);">${locatario.email}</small></td>
+          <td>${locatario.cpf}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="excluirLocatario(${locatario.id})">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       LÓGICA DE CONTRATOS & COBRANÇA
+       -------------------------------------------------------------------------- */
+    function atualizarSelectsContrato() {
+      const selectLocatario = document.getElementById("contrato-locatario");
+      const selectImovel = document.getElementById("contrato-imovel");
+
+      selectLocatario.innerHTML = `<option value="">Selecione...</option>`;
+      locatarios.forEach(l => {
+        selectLocatario.innerHTML += `<option value="${l.id}">${l.nome}</option>`;
+      });
+
+      selectImovel.innerHTML = `<option value="">Selecione...</option>`;
+      // Mostra apenas imóveis vagos
+      const imoveisVagos = imoveis.filter(i => i.status === "Vago");
+      imoveisVagos.forEach(i => {
+        selectImovel.innerHTML += `<option value="${i.id}">${i.nome} (R$ ${i.valor.toFixed(2)})</option>`;
+      });
+    }
+
+    function handleGerarContrato(e) {
+      e.preventDefault();
+      const locatarioId = parseInt(document.getElementById("contrato-locatario").value);
+      const imovelId = parseInt(document.getElementById("contrato-imovel").value);
+      const dataInicio = document.getElementById("contrato-inicio").value;
+      const dataFim = document.getElementById("contrato-fim").value;
+
+      if(!locatarioId || !imovelId) {
+        showToast("Selecione o locatário e o imóvel!", true);
+        return;
+      }
+
+      const novoContrato = {
+        id: Date.now(),
+        locatarioId,
+        imovelId,
+        dataInicio,
+        dataFim,
+        pago: false
+      };
+
+      // Atualiza status do imóvel para Alugado
+      const imovel = imoveis.find(i => i.id === imovelId);
+      if(imovel) imovel.status = "Alugado";
+
+      contratos.push(novoContrato);
+      showToast("Contrato gerado com sucesso!");
+      document.getElementById("form-contrato").reset();
+      
+      atualizarSelectsContrato();
+      renderContratos();
+      renderDashboard();
+    }
+
+    function calcularStatusContrato(contrato) {
+      if(contrato.pago) return { label: "Pago", class: "badge-pago" };
+
+      const imovel = imoveis.find(i => i.id === contrato.imovelId);
+      const hoje = new Date();
+      const diaAtual = hoje.getDate();
+      const diaVencimento = imovel ? imovel.diaVencimento : 10;
+
+      if(diaAtual > diaVencimento) {
+        return { label: "Atrasado", class: "badge-atrasado" };
+      } else {
+        return { label: "A vencer", class: "badge-vencer" };
+      }
+    }
+
+    function marcarComoPago(id) {
+      const contrato = contratos.find(c => c.id === id);
+      if(contrato) {
+        contrato.pago = true;
+        showToast("Pagamento registrado com sucesso!");
+        renderContratos();
+        renderDashboard();
+      }
+    }
+
+    function excluirContrato(id) {
+      const contrato = contratos.find(c => c.id === id);
+      if(contrato) {
+        // Libera o imóvel vinculado
+        const imovel = imoveis.find(i => i.id === contrato.imovelId);
+        if(imovel) imovel.status = "Vago";
+      }
+
+      contratos = contratos.filter(c => c.id !== id);
+      showToast("Contrato encerrado/excluído!");
+      renderContratos();
+      renderDashboard();
+    }
+
+    function enviarWhatsApp(locatarioNome, telefone, imovelNome, valor, diaVencimento) {
+      const numeroLimpo = telefone.replace(/\D/g, "");
+      const mensagem = `Olá ${locatarioNome}, lembrete do aluguel referente ao imóvel *${imovelNome}*. Valor: *R$ ${valor.toFixed(2)}* com vencimento todo dia *${diaVencimento}*. Dúvidas, estamos à disposição!`;
+      const url = `https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, "_blank");
+    }
+
+    function gerarPDFRecibo(locatarioNome, imovelNome, valor) {
+      document.getElementById("recibo-locatario").innerText = locatarioNome;
+      document.getElementById("recibo-valor").innerText = `R$ ${valor.toFixed(2)}`;
+      document.getElementById("recibo-imovel").innerText = imovelNome;
+      document.getElementById("recibo-data").innerText = new Date().toLocaleDateString("pt-BR");
+
+      window.print();
+    }
+
+    function renderContratos() {
+      const tbody = document.getElementById("lista-contratos");
+      tbody.innerHTML = "";
+
+      if(contratos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">Nenhum contrato ativo.</td></tr>`;
+        return;
+      }
+
+      contratos.forEach(contrato => {
+        const locatario = locatarios.find(l => l.id === contrato.locatarioId) || { nome: "Removido", telefone: "" };
+        const imovel = imoveis.find(i => i.id === contrato.imovelId) || { nome: "Removido", valor: 0, diaVencimento: 1 };
+        const statusObj = calcularStatusContrato(contrato);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${locatario.nome}</strong></td>
+          <td>${imovel.nome}</td>
+          <td>R$ ${imovel.valor.toFixed(2)}</td>
+          <td>Dia ${imovel.diaVencimento}</td>
+          <td><span class="badge ${statusObj.class}">${statusObj.label}</span></td>
+          <td>
+            <div class="actions-cell">
+              ${!contrato.pago ? `<button class="btn btn-sm btn-success" onclick="marcarComoPago(${contrato.id})">✓ Pago</button>` : ''}
+              <button class="btn btn-sm btn-secondary" onclick="enviarWhatsApp('${locatario.nome}', '${locatario.telefone}', '${imovel.nome}', ${imovel.valor}, ${imovel.diaVencimento})">📱 Whats</button>
+              <button class="btn btn-sm btn-secondary" onclick="gerarPDFRecibo('${locatario.nome}', '${imovel.nome}', ${imovel.valor})">🖨️ Recibo</button>
+              <button class="btn btn-sm btn-danger" onclick="excluirContrato(${contrato.id})">Excluir</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       LÓGICA DO DASHBOARD (CÁLCULOS & MÉTRICAS)
+       -------------------------------------------------------------------------- */
+    function renderDashboard() {
+      const totalImoveis = imoveis.length;
+      const alugados = imoveis.filter(i => i.status === "Alugado").length;
+      const vagos = imoveis.filter(i => i.status === "Vago").length;
+
+      let atrasos = 0;
+      let receitaTotal = 0;
+      let receitaPaga = 0;
+
+      contratos.forEach(contrato => {
+        const imovel = imoveis.find(i => i.id === contrato.imovelId);
+        if(imovel) {
+          receitaTotal += imovel.valor;
+          if(contrato.pago) {
+            receitaPaga += imovel.valor;
+          } else {
+            const statusObj = calcularStatusContrato(contrato);
+            if(statusObj.label === "Atrasado") atrasos++;
+          }
+        }
+      });
+
+      // Atualiza interface do Dashboard
+      document.getElementById("dash-total-imoveis").innerText = totalImoveis;
+      document.getElementById("dash-alugados").innerText = alugados;
+      document.getElementById("dash-vagos").innerText = vagos;
+      document.getElementById("dash-atrasos").innerText = atrasos;
+
+      document.getElementById("dash-receita-total").innerText = `R$ ${receitaTotal.toFixed(2)}`;
+      document.getElementById("dash-receita-paga").innerText = `R$ ${receitaPaga.toFixed(2)}`;
+    }
+
+    /* --------------------------------------------------------------------------
+       UTILITÁRIOS (TOAST NOTIFICATION)
+       -------------------------------------------------------------------------- */
+    function showToast(message, isError = false) {
+      const toast = document.getElementById("toast");
+      toast.innerText = message;
+      toast.style.backgroundColor = isError ? "var(--danger)" : "var(--secondary)";
+      toast.style.display = "block";
+
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
